@@ -244,11 +244,18 @@ public class Game extends Canvas implements Runnable, KeyListener {
 						pixels[x + y * WIDTH] = 0xFFFFFF;
 					} else if (x == fruitPosition.x && y == fruitPosition.y) {
 						pixels[x + y * WIDTH] = 0xAAAAAA;
-					} else if {
-						
 					} else {
-						pixels[x + y * WIDTH] = 0x000000;
-				}
+						boolean tailB = false;
+						for (Position p : tail) {
+							if (x == p.x && y == p.y) {
+								pixels[x + y * WIDTH] = 0xFFFFFF;
+								tailB = true;
+							}
+						}
+						if (!tailB) {
+							pixels[x + y * WIDTH] = 0x000000;
+						}
+					}
 				}
 
 			}
