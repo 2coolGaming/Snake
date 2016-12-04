@@ -34,7 +34,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public Position mediumPosition = new Position(15, HEIGHT / 2 - 2);
 	public Position hardPosition = new Position(18, HEIGHT / 2 - 2);
 	public Position superHardPosition = new Position(21, HEIGHT / 2 - 2);
-	public SnakePiece snakePosition = getSnakeStarter();
+	public Position last
 	public Direction snakeDirection = null;
 	public boolean locked = false;
 
@@ -87,14 +87,6 @@ public class Game extends Canvas implements Runnable, KeyListener {
 			System.out.println("Password digits remaining: " + password.size());
 		}
 		System.out.println("Password entered");
-	}
-
-	public SnakePiece getSnakeStarter() {
-		SnakePiece piece = new SnakePiece(new Position(new Random().nextInt(WIDTH), new Random().nextInt(HEIGHT)));
-		if (piece.currentPosition.x == fruitPosition.x && piece.currentPosition.y == fruitPosition.y) {
-			return getSnakeStarter();
-		}
-		return piece;
 	}
 
 	public static void main(String[] args) {
