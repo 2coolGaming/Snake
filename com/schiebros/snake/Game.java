@@ -34,7 +34,6 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public Position mediumPosition = new Position(15, HEIGHT / 2 - 2);
 	public Position hardPosition = new Position(18, HEIGHT / 2 - 2);
 	public Position superHardPosition = new Position(21, HEIGHT / 2 - 2);
-	public Position lastSnakePosition = null;
 	public SnakePiece snakePosition = getSnakeStarter();
 	public Direction snakeDirection = null;
 	public boolean locked = false;
@@ -45,6 +44,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public double amountOfTicks;
 	public double ns;
 	public List<Position> tail = new ArrayList<Position>();
+	private static Position lastSnakePosition = new Position(0, 0);
 
 	public Game(String title, boolean locked) {
 		this.title = title;
@@ -67,8 +67,6 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		addKeyListener(this);
 		frame.addKeyListener(this);
 		running = true;
-		
-		lastSnakePosition = snakePosition.currentPosition;
 
 		password.add(8);
 		password.add(5);
@@ -84,9 +82,9 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	}
 
 	/*
-	Prevents furthur progress in main thread, which should be the only thread
-	Also waits for numpad input for input of password.
-	*/
+	 * Prevents further progress in main thread, which should be the only thread
+	 * Also waits for numpad input for input of password.
+	 */
 	public void lock() {
 		frame.setTitle("Please enter password using numberpad to continue.");
 
@@ -97,12 +95,13 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	}
 
 	/*
-	Creates the starter piece.
-	Creates a new instance of SnakePiece and generates a new instance of the SnakePiece class at a random location.
-	Recalls the method if the location is the same location as the fruit.
-	If there is no fruit, it results in an error because the fruit is null and this method tries check a null's position,
-	which is a NullPointerException
-	*/
+	 * Creates the starter piece. Creates a new instance of SnakePiece and
+	 * generates a new instance of the SnakePiece class at a random location.
+	 * Recalls the method if the location is the same location as the fruit. If
+	 * there is no fruit, it results in an error because the fruit is null and
+	 * this method tries check a null's position, which is a
+	 * NullPointerException
+	 */
 	public SnakePiece getSnakeStarter() {
 		SnakePiece piece = new SnakePiece(new Position(new Random().nextInt(WIDTH), new Random().nextInt(HEIGHT)));
 		if (piece.currentPosition.x == fruitPosition.x && piece.currentPosition.y == fruitPosition.y) {
@@ -167,35 +166,26 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		}
 		ns = 1000000000 / amountOfTicks;
 		if (snakeDirection == Direction.LEFT) {
-			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.removeX(1);
 		}
 		if (snakeDirection == Direction.RIGHT) {
-			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.addX(1);
 		}
 		if (snakeDirection == Direction.UP) {
-			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.removeY(1);
 		}
 		if (snakeDirection == Direction.DOWN) {
-			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.addY(1);
 		}
 		if (snakePosition.currentPosition.x == fruitPosition.x && snakePosition.currentPosition.y == fruitPosition.y) {
 			eatFruit();
 		}
-		
+
 		if (tail.size() > 0) {
 			tail.remove(tail.size() - 1);
 			tail.add(lastSnakePosition);
-			System.out.println("Current Position: " + snakePosition.currentPosition.x + ", " + snakePosition.currentPosition.y);
-			System.out.println("Tail:");
-			for (Position p : tail) {
-				System.out.println(p.x + ", " + p.y);
-			}
 		}
-		
+
 		tickCounter++;
 	}
 
@@ -210,23 +200,33 @@ public class Game extends Canvas implements Runnable, KeyListener {
 			renderPixels();
 			g.drawImage(image, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
 			if (snakePosition.currentPosition.x < 0) {
-				restart();
+				restart(false);
 			}
 			if (snakePosition.currentPosition.x > WIDTH - 1) {
-				restart();
+				restart(false);
 			}
 			if (snakePosition.currentPosition.y > HEIGHT - 1) {
-				restart();
+				restart(false);
 			}
 			if (snakePosition.currentPosition.y < 0) {
-				restart();
+				restart(false);
 			}
 		}
 		g.dispose();
 		bs.show();
 	}
 
-	public void restart() {
+	public void restart(boolean escape) {
+		System.out.println("Ending Score: " + fruitsEaten);
+		
+		if (!escape) {
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		frame.dispose();
 		new Game("Snake Game 1.0", false);
 	}
@@ -246,26 +246,25 @@ public class Game extends Canvas implements Runnable, KeyListener {
 						pixels[x + y * WIDTH] = 0x5B1010;
 					else
 						pixels[x + y * WIDTH] = 0x000000;
-						
+
 				}
 			}
 			if (difficulty == 1) {
 				pixels[easyPosition.x + (easyPosition.y + 3) * WIDTH] = 0xFFFFFF;
 			}
-			
+
 			if (difficulty == 2) {
 				pixels[mediumPosition.x + (mediumPosition.y + 3) * WIDTH] = 0xFFFFFF;
 			}
-			
+
 			if (difficulty == 3) {
 				pixels[hardPosition.x + (hardPosition.y + 3) * WIDTH] = 0xFFFFFF;
 			}
-			
+
 			if (difficulty == 4) {
 				pixels[superHardPosition.x + (superHardPosition.y + 3) * WIDTH] = 0xFFFFFF;
 			}
-			
-			
+
 		} else {
 			for (int y = 0; y < HEIGHT; y++) {
 				for (int x = 0; x < WIDTH; x++) {
@@ -296,7 +295,7 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		fruitsEaten++;
 		fruitPosition = new Position(new Random().nextInt(WIDTH), new Random().nextInt(HEIGHT));
 		System.out.println("Total Score: " + fruitsEaten);
-		
+
 		if (tail.size() == 0) {
 			tail.add(lastSnakePosition);
 		} else {
@@ -311,6 +310,10 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	 * W = 87 A = 65 S = 83 D = 68
 	 */
 	public void keyPressed(KeyEvent e) {
+
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			restart(true);
+		}
 
 		if (password.size() != 0) {
 			switch (e.getKeyCode()) {
@@ -508,6 +511,14 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	}
 
 	public void keyReleased(KeyEvent e) {
+	}
+	
+	public static Position getLastSnakePosition() {
+		return lastSnakePosition;
+	}
+
+	public static void setLastSnakePosition(Position lastSnakePosition) {
+		Game.lastSnakePosition = lastSnakePosition;
 	}
 
 	public enum Direction {
