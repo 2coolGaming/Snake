@@ -3,35 +3,37 @@ package com.schiebros.snake;
 public class SnakePiece {
 
 	public Position currentPosition;
-	public Position lastPosition;
-	
+
 	public SnakePiece(Position currentPosition) {
 		this.currentPosition = currentPosition;
 	}
 
-	public SnakePiece(Position currentPosition, Position lastPosition) {
-		this.currentPosition = currentPosition;
-		this.lastPosition = lastPosition;
-	}
-	
 	public void addX(int x) {
-		lastPosition = currentPosition;
+		Game.setLastSnakePosition(currentPosition);
+		System.out.println("Before Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 		this.currentPosition.x += x;
+		System.out.println("After  Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 	}
-	
+
 	public void removeX(int x) {
-		lastPosition = currentPosition;
+		Game.setLastSnakePosition(currentPosition);
+		System.out.println("Before Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 		this.currentPosition.x -= x;
+		System.out.println("After  Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 	}
-	
+
 	public void addY(int y) {
-		lastPosition = currentPosition;
+		Game.setLastSnakePosition(currentPosition);
+		System.out.println("Before Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 		this.currentPosition.y += y;
+		System.out.println("After  Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 	}
-	
+
 	public void removeY(int y) {
-		lastPosition = currentPosition;
+		Game.setLastSnakePosition(currentPosition);
+		System.out.println("Before Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 		this.currentPosition.y -= y;
+		System.out.println("After  Last Position: " + Game.getLastSnakePosition().x + ", " + Game.getLastSnakePosition().y);
 	}
 
 }
