@@ -83,6 +83,10 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		new Thread(this).start();
 	}
 
+	/*
+	Prevents furthur progress in main thread, which should be the only thread
+	Also waits for numpad input for input of password.
+	*/
 	public void lock() {
 		frame.setTitle("Please enter password using numberpad to continue.");
 
@@ -92,6 +96,13 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		System.out.println("Password entered");
 	}
 
+	/*
+	Creates the starter piece.
+	Creates a new instance of SnakePiece and generates a new instance of the SnakePiece class at a random location.
+	Recalls the method if the location is the same location as the fruit.
+	If there is no fruit, it results in an error because the fruit is null and this method tries check a null's position,
+	which is a NullPointerException
+	*/
 	public SnakePiece getSnakeStarter() {
 		SnakePiece piece = new SnakePiece(new Position(new Random().nextInt(WIDTH), new Random().nextInt(HEIGHT)));
 		if (piece.currentPosition.x == fruitPosition.x && piece.currentPosition.y == fruitPosition.y) {
