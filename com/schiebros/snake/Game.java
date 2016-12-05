@@ -34,7 +34,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
 	public Position mediumPosition = new Position(15, HEIGHT / 2 - 2);
 	public Position hardPosition = new Position(18, HEIGHT / 2 - 2);
 	public Position superHardPosition = new Position(21, HEIGHT / 2 - 2);
-	public Position last
+	public Position lastSnakePosition = null;
+	public SnakePiece snakePosition = getSnakeStarter();
 	public Direction snakeDirection = null;
 	public boolean locked = false;
 
@@ -66,6 +67,8 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		addKeyListener(this);
 		frame.addKeyListener(this);
 		running = true;
+		
+		lastSnakePosition = snakePosition.currentPosition;
 
 		password.add(8);
 		password.add(5);
@@ -87,6 +90,14 @@ public class Game extends Canvas implements Runnable, KeyListener {
 			System.out.println("Password digits remaining: " + password.size());
 		}
 		System.out.println("Password entered");
+	}
+
+	public SnakePiece getSnakeStarter() {
+		SnakePiece piece = new SnakePiece(new Position(new Random().nextInt(WIDTH), new Random().nextInt(HEIGHT)));
+		if (piece.currentPosition.x == fruitPosition.x && piece.currentPosition.y == fruitPosition.y) {
+			return getSnakeStarter();
+		}
+		return piece;
 	}
 
 	public static void main(String[] args) {
@@ -145,20 +156,35 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		}
 		ns = 1000000000 / amountOfTicks;
 		if (snakeDirection == Direction.LEFT) {
+			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.removeX(1);
 		}
 		if (snakeDirection == Direction.RIGHT) {
+			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.addX(1);
 		}
 		if (snakeDirection == Direction.UP) {
+			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.removeY(1);
 		}
 		if (snakeDirection == Direction.DOWN) {
+			lastSnakePosition = snakePosition.currentPosition;
 			snakePosition.addY(1);
 		}
 		if (snakePosition.currentPosition.x == fruitPosition.x && snakePosition.currentPosition.y == fruitPosition.y) {
 			eatFruit();
 		}
+		
+		if (tail.size() > 0) {
+			tail.remove(tail.size() - 1);
+			tail.add(lastSnakePosition);
+			System.out.println("Current Position: " + snakePosition.currentPosition.x + ", " + snakePosition.currentPosition.y);
+			System.out.println("Tail:");
+			for (Position p : tail) {
+				System.out.println(p.x + ", " + p.y);
+			}
+		}
+		
 		tickCounter++;
 	}
 
@@ -259,6 +285,12 @@ public class Game extends Canvas implements Runnable, KeyListener {
 		fruitsEaten++;
 		fruitPosition = new Position(new Random().nextInt(WIDTH), new Random().nextInt(HEIGHT));
 		System.out.println("Total Score: " + fruitsEaten);
+		
+		if (tail.size() == 0) {
+			tail.add(lastSnakePosition);
+		} else {
+			tail.add(tail.get(tail.size() - 1));
+		}
 	}
 
 	public void keyTyped(KeyEvent e) {
